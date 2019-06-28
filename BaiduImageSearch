@@ -1,0 +1,65 @@
+#python批量爬百度图片搜索的图片
+
+
+#参考：https://blog.csdn.net/qq_40774175/article/details/81273198
+#输入你想搜索的名字，为你搜索并下载图片
+
+import os
+import re
+import time
+import urllib.parse
+import urllib.request
+
+
+def urlOpenMethod(url,floder = 'uname'):        #获取所有的图片地址
+
+    if os.path.exists(floder):      #如果文件名存在，则直接保存，否则创建一个
+        pass
+    else :
+        os.mkdir(floder)
+    os.chdir(floder)                #将当前工作区间切换为创建的目录下
+
+    req = urllib.request.Request(url)
+    response = urllib.request.urlopen(req)
+    html = response.read().decode('utf8')
+    picUrl = re.findall('"objURL":"(.*?)",',html,re.S)      #通过正则表达式获取图片的URL
+
+    '''                     #如果后续出错，则调用以下方法确认代码是否无误
+    print(html)
+    print(picUrl)
+    with open('001.txt','w+') as f:
+        f.write("".join(picUrl))        #list转str后写入
+
+    with open('002.txt','w',encoding = 'utf8')as f1:    #转成utf8格式后可以写入
+        f1.write(html)
+     '''
+
+    for i in picUrl:                    #将图片下载下来
+        print(i)
+        picDownload(i)
+        time.sleep(0.5)
+
+
+def picDownload(url):                   #下载文件用的函数，由urlOpenMethod传递url
+    try:                                #try-catch防止网络等原因造成的exception
+        if url is not None:             #如果获取连接时网址错误，则跳过这个url
+            resp = urllib.request.urlopen(url)
+            pic = resp.read()
+            fileName = url.rsplit('/', 1)           #以网址的最后一段作为文件名
+            with open(fileName[1], 'wb') as f:
+                f.write(pic)
+        else:
+            print('error: picture cannot download by None')
+    except BaseException:
+        print('error: cannot download picture!')
+
+
+if __name__ == '__main__':
+    findName = input('input what u want to search in baiduPicture:')           #键入想要搜索的名称
+    findName = urllib.parse.quote(findName)
+    url = 'http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word=' + findName + '&p='       #获得链接
+    urlOpenMethod(url,urllib.parse.unquote(findName))
+
+
+
+
