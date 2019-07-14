@@ -1,10 +1,10 @@
 #   利用fanyi.youdao.com来进行翻译
 
-#   2019/06/25版本，对应版本：
-#   Date: Tue, 25 Jun 2019 07:04:14 GMT
-#   Expires: Thu, 25 Jul 2019 05:13:46 GMT
-#   Last-Modified: Mon, 08 Apr 2019 06:40:36 GMT
-#   fanyi.min.js  search 'sign'
+#   2019/07/14版本，对应版本：
+#   Date: Sun, 14 Jul 2019 07:34:40 GMT
+#   Expires: Mon, 12 Aug 2019 06:39:21 GMT
+#   Last-Modified: Sun, 07 Jul 2019 16:20:47 GMT
+#   fanyi.min.js  search 'sign'    //sign: n.md5("fanyideskweb" + e + i + "97_3(jkMYg@T[KZQmqjTK")
 #   https://blog.csdn.net/shihongji/article/details/81261348
 
 import urllib.parse
@@ -33,7 +33,7 @@ def translator():       #主进程
                       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'
     }
 
-    key = '@6f#X3=cCuncYssPsuRUE'  # 密钥
+    key = '97_3(jkMYg@T[KZQmqjTK'  # 密钥
     timeStamp = str(int(time.time() * 1000))  # 获取时间
     salt = timeStamp + str(random.randint(0, 10))
     url = 'http://fanyi.youdao.com/translate_o?smartresult=dict&smartresult=rule'  # 翻译的网址
