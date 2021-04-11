@@ -5,4 +5,6 @@ order: 4
 ---
 
 
-> **Note**: Add Markdown syntax content to file `_tabs/about.md` and it will show up on this page.
+单纯用来做笔记的blog
+
+如果你认为哪里写的不对，可以email给我：cy1245171920@outlook.com
