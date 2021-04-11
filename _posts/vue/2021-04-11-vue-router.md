@@ -12,6 +12,7 @@ mermaid: true
 
 ## 定义vue-router
 - 简单定义
+
 ```js
 // 定义组件
 const f = { template: '<div>f</div>' }
@@ -34,10 +35,12 @@ const app = new Vue({
 }).$mount('#app')
 
 ```
+
 - 通常定义
     - 路由懒加载:设置路由懒加载后,只有访问他的上级路径时,才会加载该路由的js文件
     - webpackChunk:相同chunkname的路由会被放到同一个文件下
     - 路由元信息(meta): 可在component中通过`this.$route.meta`来获取
+
 ```js
 router.config.js
 
@@ -124,6 +127,7 @@ const router = new VueRouter({
 })
 ```
 - router-view
+
 ```html
 <div class="abc">
     <!-- 以router.config.js为例,当前页面若为/home/b,则router-view会在此处渲染component为b的组件 -->
@@ -132,7 +136,9 @@ const router = new VueRouter({
     <router-view name="helper"></router-view>
 </div>
 ```
+
 - props解耦
+
 ```js
 export default{
     name: 'e',
@@ -144,6 +150,7 @@ export default{
 
 ### HTML
 - to:点击后将值传到`router.push()`
+
 ```html
   <router-link to="/a">a</router-link>
   <!-- router-link会变为 -->
@@ -157,22 +164,30 @@ export default{
   <!-- 带参,等效于/register?plan=private -->
   <router-link :to="{ path: 'register', query: { plan: 'private' }}">Register</router-link>
 ```
+
 - replace:点击后调用`router.replace()`,无历史记录
+
 ```html
 <router-link :to="{ path: '/abc' }" replace></router-link>
 ```
+
 - append:在相对路径后添加路径
+
 ```html
 <!-- 当前路径为/a, 则点击后路径变为/a/b -->
 <router-link :to="{ path: 'b' }" append></router-link>
 ```
+
 - tag:将router-link渲染为其他标签,仍保留点击导航的效果
+
 ```html
 <router-link :to="{ path: 'c' }" tag="li">c</router-link>
 <!-- 等效于 -->
 <li>c</li>
 ```
+
 - event:声明可以触发导航的事件
+
 ```html
 <!-- 当点击或鼠标移到a上时,触发导航跳转 -->
 <router-link :to="{ path: '/a' }" event="mouseover">a</router-link>
