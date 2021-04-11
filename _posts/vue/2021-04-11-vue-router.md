@@ -1,5 +1,5 @@
 ---
-title: Vue-Router
+title: Vue Router
 author: voidblank
 date: 2021-04-11 14:35:00 +0800
 categories: [vue]
@@ -145,17 +145,17 @@ export default{
 ### HTML
 - to:点击后将值传到`router.push()`
 ```html
-<router-link to="/a">a</router-link>
-<!-- router-link会变为 -->
-<a href="/a">a</a>
+  <router-link to="/a">a</router-link>
+  <!-- router-link会变为 -->
+  <a href="/a">a</a>
 
-<!-- 使用v-bind绑定 -->
-<router-link :to="'home'">home</router-link>
-<router-link :to="{ path: 'home' }">home</router-link>
-<!-- 命名的路由 -->
-<router-link :to="{ name: 'user', params: { userId: 123 }}">user</router-link>
-<!-- 带参,等效于/register?plan=private -->
-<router-link :to="{ path: 'register', query: { plan: 'private' }}">Register</router-link>
+  <!-- 使用v-bind绑定 -->
+  <router-link :to="'home'">home</router-link>
+  <router-link :to="{ path: 'home' }">home</router-link>
+  <!-- 命名的路由 -->
+  <router-link :to="{ name: 'user', params: { userId: 123 }}">user</router-link>
+  <!-- 带参,等效于/register?plan=private -->
+  <router-link :to="{ path: 'register', query: { plan: 'private' }}">Register</router-link>
 ```
 - replace:点击后调用`router.replace()`,无历史记录
 ```html
