@@ -1,5 +1,5 @@
 ---
-title: Vue Router
+title: Vue-Router
 author: voidblank
 date: 2021-04-11 14:35:00 +0800
 categories: [vue]
