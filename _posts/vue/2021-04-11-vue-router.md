@@ -13,7 +13,7 @@ mermaid: true
 ## 定义vue-router
 - 简单定义
 
-```js
+```js1
 // 定义组件
 const f = { template: '<div>f</div>' }
 const b = { template: '<div>b</div>' }
