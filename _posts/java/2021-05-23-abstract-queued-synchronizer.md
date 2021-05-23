@@ -17,7 +17,7 @@ mermaid: true
 ### head
 - `private transient volatile Node head;`
 - 阻塞队列的头部,懒加载
-- 仅会通过[setHead()](#sethead)来进行初始化
+- 仅会通过[setHead()](#setheadnode)来进行初始化
 - 如果存在`head`,那么状态一定不为[CANCELLED](#cancelled)
 
 ### tail
@@ -952,7 +952,7 @@ public final void signalAll() {
   - [addConditionWaiter()](#addconditionwaiter)
   - [fullyRelease(Node)](#fullyreleasenode)
   - [isOnSyncQueue(Node)](#isonsyncqueuenode)
-  - [acquireQueued(Node, int)](#acquirequeuednode,-int)
+  - [acquireQueued(Node, int)](#acquirequeuednode-int)
   - [selfInterrupt()](#selfinterrupt)
 
 ```java
