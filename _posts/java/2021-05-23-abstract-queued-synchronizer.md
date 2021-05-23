@@ -17,7 +17,7 @@ mermaid: true
 ### head
 - `private transient volatile Node head;`
 - 阻塞队列的头部,懒加载
-- 仅会通过[setHead()](#sethead())来进行初始化
+- 仅会通过[setHead()](#sethead)来进行初始化
 - 如果存在`head`,那么状态一定不为[CANCELLED](#cancelled)
 
 ### tail
@@ -146,7 +146,7 @@ private void unparkSuccessor(Node node) {
 
 ### doReleaseShared()
 - `private void doReleaseShared()`
-- 成功释放锁,会调用[unparkSuccessor(Node)](#unparksuccessor(node))来通知后续节点
+- 成功释放锁,会调用[unparkSuccessor(Node)](#unparksuccessornode)来通知后续节点
 
 ```java
 private void doReleaseShared() {
@@ -258,7 +258,7 @@ private void cancelAcquire(Node node) {
 - `private final boolean parkAndCheckInterrupt()`
 - 将当前线程park掉,返回该线程是否处在中断状态
 
-### acquireQueued(Node,int)
+### acquireQueued(Node, int)
 - 以独占不可中断模式获取已经在队列中的线程
 - 如果在等待时被中断则返回true,否则返回false
 
@@ -334,7 +334,7 @@ final boolean acquireQueued(final Node node, int arg) {
 - `protected boolean isHeldExclusively()`
 - 当调用线程拥有独占锁时,返回true
 - 需要子类实现
-- 非阻塞的Condition会[调用](#signal())该方法,阻塞的会调用[release(int)](#release(int))
+- 非阻塞的Condition会[调用](#signal-1)该方法,阻塞的会调用[release(int)](#releaseint)
 
 ### acquire(int)
 - `public final void acquire(int arg)`
@@ -639,7 +639,7 @@ public final Collection<Thread> getSharedQueuedThreads() {
 ### isOnSyncQueue(Node)
 - 判断指定节点是否在同步队列中
 - 相关:
-  - [findNodeFromTail(Node)](#findnodefromtail(node))
+  - [findNodeFromTail(Node)](#findnodefromtailnode)
 
 ```java
 final boolean isOnSyncQueue(Node node) {
@@ -674,8 +674,8 @@ private boolean findNodeFromTail(Node node) {
 ### transferForSignal(Node)
 - 将一个在条件队列([Node.CONDITION](#condition))的节点加入到同步队列中,成功返回true,失败返回false
 - 相关:
-  - [enq(Node)](#enq(node))
-  - [doSignal(Node)](#dosignal(node))
+  - [enq(Node)](#enqnode)
+  - [doSignal(Node)](#dosignalnode)
 
 ```java
 final boolean transferForSignal(Node node) {
@@ -791,7 +791,7 @@ public final boolean owns(ConditionObject condition) {
 - 表示当前节点的后继节点
 - 独占模式用的节点,双向队列
 - 当head任务完成后,head.next为null,所以AQS中的遍历都是由tail向前遍历的
-- 同时线程在acquire操作失败后会执行[cancelAcquire(Node)](#cancelacquire(node)),此时会将该节点的next设为自身,如果从tail倒序遍历则不会受到影响
+- 同时线程在acquire操作失败后会执行[cancelAcquire(Node)](#cancelacquirenode),此时会将该节点的next设为自身,如果从tail倒序遍历则不会受到影响
 
 ### thread
 - `volatile Thread thread;`
@@ -824,7 +824,7 @@ public final boolean owns(ConditionObject condition) {
 ### addConditionWaiter()
 - 在等待队列中添加一个新节点,返回该节点
 - 相关:
-  - [unlinkCancelledWaiters()](#unlinkcancelledwaiters())
+  - [unlinkCancelledWaiters()](#unlinkcancelledwaiters)
 
 ```java
 private Node addConditionWaiter() {
@@ -849,8 +849,8 @@ private Node addConditionWaiter() {
 ### doSignal(Node)
 - 将条件队列的头节点唤醒,加入到AQS的同步队列中
 - 相关:
-  - [transferForSignal(Node)](#transferforsignal(node))
-  - [signal()](#signal())
+  - [transferForSignal(Node)](#transferforsignalnode)
+  - [signal()](#signal-1)
 
 ```java
 private void doSignal(Node first) {
@@ -868,8 +868,8 @@ private void doSignal(Node first) {
 ### doSignalAll(Node)
 - 将所有的条件队列上的节点唤醒，加入到同步队列
 - 相关:
-  - [transferForSignal(Node)](#transferforsignal(node))
-  - [signalAll()](#signalall())
+  - [transferForSignal(Node)](#transferforsignalnode)
+  - [signalAll()](#signalall)
 
 ```java
 private void doSignalAll(Node first) {
@@ -918,8 +918,8 @@ private void unlinkCancelledWaiters() {
 ### signal()
 - 唤醒条件队列的首节点
 - 相关:
-  - [isHeldExclusively()](#isheldexclusively())
-  - [doSignal(Node)](#dosignal(node))
+  - [isHeldExclusively()](#isheldexclusively)
+  - [doSignal(Node)](#dosignalnode)
 
 ```java
 public final void signal() {
@@ -934,8 +934,8 @@ public final void signal() {
 ### signalAll()
 - 唤醒条件队列的所有节点
 - 相关:
-  - [isHeldExclusively()](#isheldexclusively())
-  - [doSignalAll(Node)](#dosignalall(node))
+  - [isHeldExclusively()](#isheldexclusively)
+  - [doSignalAll(Node)](#dosignalallnode)
 
 ```java
 public final void signalAll() {
@@ -949,11 +949,11 @@ public final void signalAll() {
 
 ### awaitUninterruptibly()
 - 相关:
-  - [addConditionWaiter()](#addconditionwaiter())
-  - [fullyRelease(Node)](#fullyrelease(node))
-  - [isOnSyncQueue(Node)](#isonsyncqueue(node))
-  - [acquireQueued(Node, int)](#acquirequeued(node,-int))
-  - [selfInterrupt()](#selfinterrupt())
+  - [addConditionWaiter()](#addconditionwaiter)
+  - [fullyRelease(Node)](#fullyreleasenode)
+  - [isOnSyncQueue(Node)](#isonsyncqueuenode)
+  - [acquireQueued(Node, int)](#acquirequeuednode,-int)
+  - [selfInterrupt()](#selfinterrupt)
 
 ```java
 public final void awaitUninterruptibly() {
