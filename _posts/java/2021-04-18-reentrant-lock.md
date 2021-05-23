@@ -3,7 +3,7 @@ title: ReentrantLock
 author: voidblank
 date: 2021-04-18 14:15:00 +0800
 categories: [Java]
-tags: [java, java源码, JDK1.8, 后台]
+tags: [java, java源码, JDK1.8, 后台, 锁]
 math: true
 mermaid: true
 ---
