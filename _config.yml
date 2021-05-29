@@ -131,7 +131,7 @@ defaults:
       type: tabs             # see `site.collections`
     values:
       layout: page
-      permalink: /:categories/:title/
+      permalink: /categories/:title/
       dynamic_title: true    # Hide title in mobile screens.
 
 sass:
