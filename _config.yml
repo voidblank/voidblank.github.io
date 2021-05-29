@@ -103,7 +103,7 @@ kramdown:
 
 # DO NOT change this unless you're a Pro user on Jekyll and Web development,
 # Or you think you're smart enough to change other relevant URLs within this template.
-permalink: /posts/:categories/:title/
+permalink: /posts/:title/
 
 collections:
   tabs:
@@ -168,5 +168,4 @@ jekyll-archives:
     tag: tag
   permalinks:
     tag: /tags/:name/
-    # category: /categories/:name/
-    category: /posts/:name/
+    category: /categories/:name/
