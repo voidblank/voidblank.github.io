@@ -118,7 +118,6 @@ defaults:
       type: posts
     values:
       layout: post
-      permalink: /posts/:title/
       comments: true    # Enable comments in posts.
       toc: true         # Display TOC column in posts.
   -
@@ -169,4 +168,4 @@ jekyll-archives:
     tag: tag
   permalinks:
     tag: /tags/:name/
-    category: /category/:name/
+    category: /categories/:name/
