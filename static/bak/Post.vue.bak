@@ -1,0 +1,332 @@
+<template>
+<div>
+  <div class="top">
+    <h1 class="title">{{ post.title }}</h1>
+    <span class="author">{{ post.message.author }}</span>
+      write on
+    <el-tooltip class="item" :effect="$store.getters.isDark ? 'light' : 'dark'" :content="post.create" placement="bottom">
+      <span>{{ post.createTime }}</span>
+    </el-tooltip>
+    · updated
+    <el-tooltip class="item" :effect="$store.getters.isDark ? 'light' : 'dark'" :content="post.modify" placement="bottom">
+      <span>{{ post.modifyTime }}</span>
+    </el-tooltip>
+  </div>
+  <div v-html="context" style="line-height: 30px;"/>
+</div>
+</template>
+<script>
+import moment from 'moment'
+import objectUtil from '../../utils/objectUtil'
+import timeUtil from '../../utils/timeUtil'
+export default {
+  name: 'post',
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    category: {
+      type: String,
+      required: true
+    }
+  },
+  data () {
+    return {
+      context: 'catrgory: ' + this.category + ' ,title: ' + this.title,
+      post: {},
+      nowTitle: undefined, // 上一个插入的标题节点
+      topTitle: {}, // 当前插入的整颗标题树,遇到新的h1节点后会重置
+      titleList: [], // 整篇文章的节点树,对于现在的blog来说,与topTitle没区别
+      regOfCodeStart: /<pre><code(.*?)>/i, // 检查代码段开始
+      regOfCodeEnd: /<\/code><\/pre>/i, // 检查代码段结束,配合codeDiv
+      regOfTitleLevel: /\d/i, // 检查当前是h?,来划分标题层级
+      regOfTitleStart: /<h\d[^>]*>/i, // 标题起始
+      regOfTitleEnd: /<\/h\d[^>]*>/i, // 标题结尾
+      regOfTitleId: /id=".*"/i, // 读取标题id,用于重写,因为showdown的id没有意义
+      regOfLink: /href="\/(.*)"/i, // 检查<a>中的href,暂时弃用
+      keyMap: {}, // 用于记录已经出现过的id,为:k-v,k为id值(不包括数字),v为出现过几次
+      isCode: false // 当代码段开始时,设为true,当代码段结束时,设为false
+    }
+  },
+  created () {
+    this.init()
+  },
+  methods: {
+    /**
+     * 初始化,读取文件,进行转换
+     */
+    async init () {
+      const vm = this
+      const file = vm.$store.getters.getUrlByCategoryAndTitle({ category: this.category, title: this.title })
+      this.post = file
+      await import('@/assets/posts1' + file.path).then(response => {
+        vm.context = response.s
+      })
+      // vm.context = vm.md2html(vm.context)
+      // this.converterHtml()
+      this.postTopMessage()
+      scrollTo(0, 0)
+      this.initRightSideButton()
+    },
+    /**
+     * 对转换后的html进行修改
+     */
+    converterHtml () {
+      const htmlList = this.context.split('\n')
+      let context = ''
+      htmlList.forEach(line => {
+        if (this.regOfLink.test(line)) {
+          line = this.converterLink(line) // 如果是<a href="/...">,进行修改
+        }
+        if (this.regOfCodeStart.test(line)) {
+          line = this.converterCode(line) // 如果是代码段开始,修改
+        }
+        if (this.isCode && this.regOfCodeEnd.test(line)) {
+          line = this.converterCodeEnd(line) // 如果是代码段结尾,修改
+        }
+        if (!this.isCode && this.regOfTitleStart.test(line)) {
+          line = this.converterTitle(line) // 如果是<h?>,开始处理标题
+        }
+        context += line + '\n' // 每一行最后要把换行符加回去
+      })
+      objectUtil.isNotEmpty(this.topTitle) && this.titleList.push(this.topTitle)
+      this.context = context
+      this.$emit('initTree', this.titleList) // 完成后,通知父组件
+    },
+    /**
+     * 对<a href="/...">进行修改,暂时去掉
+     * @param {string} text
+     */
+    converterLink (text) {
+      // this.regOfLink.lastIndex = 0
+      // const t = this.regOfLink.exec(text)[0]
+      // const len = text.indexOf(t) + t.length
+      // const links = '@'
+      return text
+    },
+    /**
+     * 对代码段开始进行处理
+     * @param {string} text
+     */
+    converterCode (text) {
+      this.regOfCodeStart.lastIndex = 0
+      const t = this.regOfCodeStart.exec(text)[0]
+      const len = text.indexOf(t) + t.length
+      const language = t.substring(t.lastIndexOf('-') + 1, t.lastIndexOf('"'))
+      // 增加一个显示的代码类型指示符,修正代码段的padding
+      const lt = '<span class="code-mark">' + language.toUpperCase() + '</span><div class="my-code">'
+      this.isCode = true
+      return text.substring(0, len) + lt + text.substring(len)
+    },
+    /**
+     * 对代码段结尾开始处理
+     * @param {string} text
+     */
+    converterCodeEnd (text) {
+      this.regOfCodeEnd.lastIndex = 0
+      const t = this.regOfCodeEnd.exec(text)[0]
+      const len = text.indexOf(t) - t.length
+      // 手动闭合,否则浏览器修正会出现问题
+      const lt = '</div>'
+      this.isCode = false
+      return text.substring(0, len) + lt + text.substring(len)
+    },
+    /**
+     * 获取标题树
+     * @param {string} text
+     */
+    converterTitle (text) {
+      // 初始化
+      this.regOfTitleStart.lastIndex = 0
+      this.regOfTitleEnd.lastIndex = 0
+      this.regOfTitleLevel.lastIndex = 0
+      this.regOfTitleId.lastIndex = 0
+      // 标签
+      let startString = this.regOfTitleStart.exec(text)[0]
+      const startIndex = text.indexOf(startString)
+      const startLen = startIndex + startString.length
+      const endString = this.regOfTitleEnd.exec(text)[0]
+      const endIndex = text.indexOf(endString)
+      // const endLen = endIndex + endString.length
+      const h = parseInt(this.regOfTitleLevel.exec(startString)[0])
+      // 标题字符串
+      const titleString = text.substring(startLen, endIndex).trim().replace('&amp;', '&')
+      // 修改id
+      let idString = encodeURI(titleString.replace('-', '').replace('(', '').replace(')', '').replace(' ', '').replace(',', '').replace('&', '').toLowerCase())
+      // 更新keyMap数据,重复的标题要加上  -number
+      if (this.keyMap[idString]) {
+        this.keyMap[idString] += 1
+        idString += '-' + (this.keyMap[idString] - 1)
+      } else {
+        this.keyMap[idString] = 1
+      }
+      const idStr = 'id="' + idString + '"'
+      startString = startString.replace(this.regOfTitleId, idStr)
+      // 如果是<h1>,视作一级标题,如果是第一个标题,也算作标题
+      if (h === 1 || objectUtil.isEmpty(this.topTitle)) {
+        objectUtil.isNotEmpty(this.topTitle) && this.titleList.push(this.topTitle)
+        this.topTitle = {}
+        this.topTitle.label = titleString
+        this.topTitle.level = h
+        this.topTitle.children = []
+        this.topTitle.parent = undefined
+        this.topTitle.id = idString
+        this.nowTitle = idString
+      } else {
+        // 否则就执行插入操作
+        this.insertNode(this.topTitle, h, titleString, idString)
+      }
+      return text.substring(0, startIndex) + startString + text.substring(startLen)
+    },
+    /**
+     * 将当前标题插入到标题树中
+     * @param {{label: string, level: int, parent: string, id: string, children: Array}} topTitle
+     * @param {Number} level
+     * @param {string} tLine
+     * @param {string} idString
+     */
+    insertNode (topTitle, level, tLine, idString) {
+      // 如果现在的id和查到的id相同,且是他的下一级,则直接插入到他的children中
+      if (this.nowTitle === topTitle.id) {
+        if (level === topTitle.level + 1) {
+          const item = {
+            label: tLine,
+            parent: topTitle.id,
+            level: level,
+            children: [],
+            id: idString
+          }
+          this.nowTitle = idString
+          topTitle.children.push(item)
+          return
+        } else {
+          // 否则的话,说明和他平级,重新去找父级
+          this.nowTitle = topTitle.parent
+          return this.insertNode(this.topTitle, level, tLine, idString)
+        }
+      }
+      // 如果都不满足,说明不是他的直接child,向下查找
+      topTitle.children.forEach(child => {
+        this.insertNode(child, level, tLine, idString)
+      })
+    },
+    postTopMessage () {
+      this.post.create = moment(this.post.create).format('YYYY-MM-DD')
+      this.post.createTime = timeUtil.getShowTime(this.post.create)
+      this.post.modifyTime = timeUtil.getShowTime(this.post.modify)
+    },
+    initRightSideButton () {
+      document.body.setAttribute('html-show-sidebar-toc', true)
+      var sidebarTOCBtn = document.getElementById('sidebar-toc-btn')
+      sidebarTOCBtn.addEventListener('click', function (event) {
+        event.stopPropagation()
+        if (document.body.hasAttribute('html-show-sidebar-toc')) {
+          document.body.removeAttribute('html-show-sidebar-toc')
+        } else {
+          document.body.setAttribute('html-show-sidebar-toc', true)
+        }
+      })
+    }
+  }
+}
+</script>
+<style>
+html, body{
+  scroll-behavior: smooth;
+} */
+h1{
+  font-size: 28px;
+}
+code {
+  font-family: Menlo,Monaco,Consolas,'Courier New',monospace;
+  font-size: .85em !important;
+  color: #000;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  padding: 3px 5px;
+}
+table {
+    margin: 10px 0 15px 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: block;
+    width: 100%;
+    overflow: auto;
+    word-break: normal;
+    word-break: keep-all;
+}
+td {
+  border: 1px solid #d6d6d6;
+  padding: 6px 13px;
+}
+th {
+  border: 1px solid #d6d6d6;
+  padding: 6px 13px;
+}
+li > a:link{
+  color: #2a408e;
+  font-family: 'Source Sans Pro', 'Microsoft Yahei', sans-serif;
+  text-decoration: none;
+}
+li > a:visited{
+  color: #2a408e;
+  text-decoration: none;
+}
+li > a:hover{
+  color: #D2603A
+}
+.top{
+  user-select: none;
+  color: #6C757D;
+  margin-bottom: 5.0rem;
+}
+.title{
+  color: #000000;
+  font-size: 2.5rem;
+  margin-bottom: 1.8rem;
+  margin-top: 0.5rem;
+}
+.author{
+  font-weight: 600 !important;
+}
+.my-code {
+  padding: 18px 24px 18px 16px;
+  line-height: 20px;
+}
+.code-mark {
+  line-height: 16px;
+  float: right;
+  user-select: none;
+  color: #8c8c8c;
+}
+.md-sidebar-toc{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 1;
+  width: 300px;
+  height: 100%;
+  padding: 32px 0 48px 0;
+  font-size: 14px;
+  box-shadow: 0 0 4px rgb(150 150 150 / 33%);
+  box-sizing: border-box;
+  overflow: auto;
+  background-color: inherit;
+}
+.md-sidebar-toc > li,ul{
+  list-style-type: none;
+}
+#sidebar-toc-btn{
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  font-size: 28px;
+  cursor: pointer;
+  color: inherit;
+  z-index: 99;
+  width: 32px;
+  text-align: center;
+  opacity: .4;
+}
+</style>

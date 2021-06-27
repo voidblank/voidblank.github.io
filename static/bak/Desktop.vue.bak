@@ -1,0 +1,184 @@
+<template>
+  <div>
+    <el-container>
+      <el-container>
+        <el-header style="height: 30px;">
+        </el-header>
+        <el-main class="main-page">
+          <post :title="title" :category="category" @initTree="initTree"/>
+        </el-main>
+        <el-footer style="height: auto;">
+          <comment/>
+        </el-footer>
+      </el-container>
+      <el-aside style="width: 30%;">
+        <div id="tree">
+          <el-tree
+          ref="tree"
+          node-key="id"
+          :data="treeData"
+          @node-click="nodeClick"
+          highlight-current
+          accordion>
+          <template slot-scope="{ node, data }">
+            <a :id="'title-tree-' + data.id" class="my-node" :href="'#' + data.id">{{ node.label }}</a>
+          </template>
+        </el-tree>
+        </div>
+      </el-aside>
+    </el-container>
+  </div>
+</template>
+<script>
+import Post from './Post.vue'
+import comment from '../comment'
+export default {
+  name: 'DesktopPost',
+  components: { Post, comment },
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    category: {
+      type: String,
+      required: true
+    }
+  },
+  data () {
+    return {
+      treeData: [],
+      rightSideWidth: '300px', // default
+      currentKey: undefined,
+      treeIdPosition: [],
+      treeIdMap: {}
+    }
+  },
+  watch: {
+    currentKey: {
+      // 监听key的变化值,注意该值和tree中的key并非一个值
+      handler () {
+        // 发生变化后,修改tree内部的key,将除了该节点之外的节点都收起
+        this.$refs.tree.setCurrentKey(this.currentKey)
+        const map = this.$refs.tree.store.nodesMap
+        Object.keys(map).forEach(k => {
+          map[k].expanded = k === this.currentKey
+        })
+        // 之后递归拿到所有的节点
+        this.findParentIdBySubId(this.currentKey)
+      }
+    }
+  },
+  mounted () {
+    // 动态设置右边栏宽度
+    this.rightSideWidth = window.screen.width * 0.25 + 'px'
+    // 设置滑动的方法
+    window.addEventListener('scroll', this.scrollToTitle)
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scrollToTitle)
+  },
+  methods: {
+    /**
+     * 初始化树
+     * 初始化树节点map
+     * 初始化树节点列表(自上向下)
+     * @param {Array} treeData
+     */
+    initTree (treeData) {
+      this.treeData = treeData
+      treeData.forEach(t => this.initTreeIdMap(t))
+      this.$nextTick(() => {
+        treeData.forEach(p => this.initTreeIdList(p))
+        this.treeIdPosition.sort((a, b) => a.top - b.top)
+        // 初始化的时候执行一次,来手动的定位右侧树
+        this.scrollToTitle()
+      })
+    },
+    /**
+     * 初始化树节点map
+     * map格式:k-v对,k表示id,v表示该节点的父节点的id,如果是顶级节点,则为undefined
+     * @param {{parent: string, id: string, children: Array}} t
+     */
+    initTreeIdMap (t) {
+      this.treeIdMap[t.id] = t.parent
+      t.children.forEach(child => this.initTreeIdMap(child))
+    },
+    /**
+     * 初始化树节点list
+     * 列表:按自上向下的顺序存储节点的相关坐标值,用于手动滑动时判断当前屏幕顶端的节点范围
+     * @param {{id: string, value: string}} p
+     */
+    initTreeIdList (p) {
+      const pd = document.getElementById(p.id)
+      this.treeIdPosition.push({
+        id: p.id,
+        value: p.value,
+        top: pd.offsetTop,
+        left: pd.offsetLeft,
+        width: pd.offsetWidth,
+        height: pd.offsetHeight
+      })
+      p.children.forEach(c => this.initTreeIdList(c))
+    },
+    /**
+     * 点击树节点时触发,跳转到指定节点位置
+     * @param {{id: string, isChoosen: boolean}} child
+     */
+    nodeClick (child) {
+      document.getElementById('title-tree-' + child.id).click()
+      this.currentKey = child.id
+    },
+    /**
+     * 滑动时判断在哪个标题范围内,同步右侧的结构树
+     */
+    scrollToTitle () {
+      let scrollNow = document.documentElement.scrollTop || document.body.scrollTop
+      scrollNow *= 1.001 // 微调整
+      let last = this.treeIdPosition[this.treeIdPosition.length - 1].top
+      if (scrollNow >= last) {
+        this.currentKey = this.treeIdPosition[this.treeIdPosition.length - 1].id
+        return
+      }
+      for (let i = this.treeIdPosition.length - 2; i >= 0; i--) {
+        let n = this.treeIdPosition[i].top
+        if (scrollNow >= n) {
+          this.currentKey = this.treeIdPosition[i].id
+          return
+        }
+      }
+      this.currentKey = this.treeIdPosition[0].id // 如果在标题上面,则算作点击标题
+    },
+    /**
+     * 滑动的时候树节点key会变动,该方法用于将节点key及其所有父级的节点都设为打开
+     * @param {string} subId
+     */
+    findParentIdBySubId (subId) {
+      this.$refs.tree.store.nodesMap[subId].expanded = true
+      if (this.treeIdMap[subId]) {
+        this.findParentIdBySubId(this.treeIdMap[subId])
+      }
+    }
+  }
+}
+</script>
+<style>
+html, body{
+  scroll-behavior: smooth;
+}
+#tree{
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 500px;
+  position: fixed;
+  width: 25%;
+}
+.my-node{
+  color: black;
+  text-decoration: none;
+  padding-left: 4px;
+  text-overflow:ellipsis;
+  overflow: hidden;
+  /* width: 90% */
+}
+</style>

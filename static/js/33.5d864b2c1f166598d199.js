@@ -1,0 +1,2 @@
+webpackJsonp([33],{gpvs:function(e,n,t){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var i={render:function(){var e=this.$createElement,n=this._self._c||e;return n("div",[n("el-container",[n("el-main",[this._v("\n    achieve!\n    ")]),this._v(" "),n("el-footer")],1)],1)},staticRenderFns:[]},l=t("VU/8")({name:"achieveOfDesktop"},i,!1,null,null,null);n.default=l.exports}});
+//# sourceMappingURL=33.5d864b2c1f166598d199.js.map
