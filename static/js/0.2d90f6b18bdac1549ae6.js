@@ -1,2 +1,0 @@
-webpackJsonp([0],{NmDC:function(e,r,a){"use strict";var n=a("PJh5"),t=a.n(n);r.a={getShowTime:function(e){if(void 0===e||null===e)return"";var r=t()(),a=t()(e);return a.year()!==r.year()?a.year()+"年 "+(a.month()+1)+"月 "+a.date()+"日":a.week()!==r.week()?a.month()+1+"月 "+a.date()+"日":a.day()!==r.day()?r.dayOfYear()-a.dayOfYear()+"天前":a.hour()!==r.hour()?r.hour()-a.hour()+"小时前":r.minute()-a.minute()+"分钟前"}}}});
-//# sourceMappingURL=0.2d90f6b18bdac1549ae6.js.map
