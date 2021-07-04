@@ -1,0 +1,2 @@
+webpackJsonp([10],{ZNtX:function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var l={render:function(){var e=this.$createElement,t=this._self._c||e;return t("div",[t("el-container",[t("el-main",[this._v("\n    mobile tag\n    ")]),this._v(" "),t("el-footer")],1)],1)},staticRenderFns:[]},i=n("VU/8")({name:"tagOfMobile"},l,!1,null,null,null);t.default=i.exports}});
+//# sourceMappingURL=10.23880fa034f2b440ea02.js.map

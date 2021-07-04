@@ -1,0 +1,2 @@
+webpackJsonp([13],{W4RL:function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var l={render:function(){var e=this.$createElement,t=this._self._c||e;return t("div",[t("el-container",[t("el-main",[this._v("\n      mobile about\n    ")]),this._v(" "),t("el-footer")],1)],1)},staticRenderFns:[]},i=n("VU/8")({name:"aboutOfMobile"},l,!1,null,null,null);t.default=i.exports}});
+//# sourceMappingURL=13.ba092c16c09060e860ea.js.map

@@ -1,0 +1,2 @@
+webpackJsonp([11],{Bywf:function(e,n,t){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var i={render:function(){var e=this.$createElement,n=this._self._c||e;return n("div",[n("el-container",[n("el-main",[this._v("\n      mobile achieve!\n    ")]),this._v(" "),n("el-footer")],1)],1)},staticRenderFns:[]},l=t("VU/8")({name:"achieveOfMobile"},i,!1,null,null,null);n.default=l.exports}});
+//# sourceMappingURL=11.81fec6875ffb371821e2.js.map
