@@ -1,2 +1,0 @@
-webpackJsonp([14],{"pT/2":function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var s={name:"aboutOfDesktop",components:{Side:n("sRMN").a}},a={render:function(){var e=this.$createElement,t=this._self._c||e;return t("el-container",[t("el-container",[t("el-main",{staticClass:"main-page"},[this._v("\n      about!\n    ")]),this._v(" "),t("el-footer")],1),this._v(" "),t("el-aside",{staticStyle:{width:"27.5%"}},[t("side")],1)],1)},staticRenderFns:[]},i=n("VU/8")(s,a,!1,null,null,null);t.default=i.exports}});
-//# sourceMappingURL=14.js.map
